@@ -66,7 +66,7 @@ public class MapGenerator : MonoBehaviour
                 GameObject go = GetGo();
                 go.SetActive(true);
                 go.GetComponentInChildren<TextMeshPro>().text = grids[i, j].ToString();
-                go.transform.position = new Vector3(1.1f * i, 1.1f * j, 0);
+                go.transform.position = new Vector3(1.1f * i - 1.1f * grids.GetLength(0) * 0.5f, 1.1f * j - 1.1f * grids.GetLength(1) * 0.5f, 0);
             }
         }
     }

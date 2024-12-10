@@ -30,7 +30,7 @@ public static class CardCreator
 
 
         // 开始走地图
-        if (FindPath(grid, startX, startY, 1))
+        if (FindPathWithStack(grid, startX, startY, 1))
         {
             return grid;
         }
@@ -55,22 +55,8 @@ public static class CardCreator
         return x >= 0 && x < N && y >= 0 && y < N && grid[x, y] == 0;
     }
 
-    private static string PrintGrid(int[,] grid)
-    {
-        StringBuilder sb = new StringBuilder();
-        int N = grid.GetLength(0);
-        for (int i = 0; i < N; i++)
-        {
-            for (int j = 0; j < N; j++)
-            {
-                sb.Append(grid[i, j]);
-                sb.Append(',');
-            }
-            sb.AppendLine();
-        }
-        return sb.ToString();
-    }
 
+    // 递归版本，最大支持6，>= 7, Unity就会卡死
     private static bool FindPath(int[,] grid, int x, int y, int moveCount)
     {
         int N = grid.GetLength(0);
@@ -104,4 +90,69 @@ public static class CardCreator
 
         return false;
     }
+
+    // 非递归版本，最大可以支持到8,9很慢，10会卡死
+    private static bool FindPathWithStack(int[,] grid, int x, int y, int moveCount)
+    {
+        int N = grid.GetLength(0);
+
+        Stack<(int, int, int)> stack = new Stack<(int x, int y, int moveCount)>();
+        stack.Push((x, y, 1));
+
+        while (stack.Count > 0)
+        {
+            (x, y, moveCount) = stack.Pop();
+
+            if (moveCount == N * N)
+            {
+                return true;
+            }
+
+            bool moved = false;
+
+            int[] direction = { 0, 1, 2, 3 };
+
+            Shuffle(direction);
+
+            foreach (int i in direction)
+            {
+                int newX = x + directionX[i];
+                int newY = y + directionY[i];
+
+                if (IsSafe(grid, newX, newY))
+                {
+                    grid[newX, newY] = moveCount + 1;
+                    stack.Push((newX, newY, moveCount + 1));
+                    moved = true;
+                    break;
+                }
+            }
+
+            if (!moved && stack.Count > 0)
+            {
+                var (backtrackX, backTrackY, backtrackMove) = stack.Pop();
+                grid[backtrackX, backTrackY] = 0;
+            }
+        }
+
+        return false;
+    }
+
+    #region For Debug
+    private static string PrintGrid(int[,] grid)
+    {
+        StringBuilder sb = new StringBuilder();
+        int N = grid.GetLength(0);
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = 0; j < N; j++)
+            {
+                sb.Append(grid[i, j]);
+                sb.Append(',');
+            }
+            sb.AppendLine();
+        }
+        return sb.ToString();
+    }
+    #endregion
 }
