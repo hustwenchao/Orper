@@ -12,7 +12,7 @@ public class SliderWithText : MonoBehaviour
     {
         slider = GetComponent<Slider>();
         slider.onValueChanged.AddListener(OnSliderValueChanged);
-        text = GetComponentInChildren<TextMeshProUGUI>();
+        text = transform.Find("Count").GetComponent<TextMeshProUGUI>();
         text.text = slider.value.ToString();
     }
     private void OnSliderValueChanged(float value)
