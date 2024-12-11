@@ -9,10 +9,14 @@ public class MapGenerator : MonoBehaviour
     public Slider slider;
     public Slider hideCountSlider;
     public GameObject block;
+    public GameObject line;
     public int hideCount;
     private List<GameObject> cachedGos = new List<GameObject>();
     private List<GameObject> activeGos = new List<GameObject>();
     private int[,] grids;
+
+    private List<GameObject> lines = new List<GameObject>();
+    private List<GameObject> cachedLines = new List<GameObject>();
 
     int currentX = 0;
     int currentY = 0;
@@ -35,6 +39,8 @@ public class MapGenerator : MonoBehaviour
 
     private void ClickGenerateMap()
     {
+        ClearAllLines();
+
         grids = CardCreator.CreateMap((int)slider.value);
 
         while (grids == null)
@@ -105,6 +111,24 @@ public class MapGenerator : MonoBehaviour
         return go;
     }
 
+    private GameObject GetLine()
+    {
+        GameObject go;
+        if (cachedLines.Count > 0)
+        {
+            go = cachedLines[0];
+            cachedLines.RemoveAt(0);
+            go.SetActive(true);
+            lines.Add(go);
+            return go;
+        }
+
+        go = Instantiate(line);
+        go.SetActive(true);
+        lines.Add(go);
+        return go;
+    }
+
     public void Generate(int[,] grids)
     {
         GacheAllBlocks();
@@ -139,29 +163,24 @@ public class MapGenerator : MonoBehaviour
         // 判断当前的点能否走到下一个点
         if (currentX > 0 && (grids[currentX - 1, currentY] == currentNumber + 1 || grids[currentX - 1, currentY] == 0))
         {
-            Debug.Log(1);
             return true;
         }
 
         if (currentX < grids.GetLength(0) - 1 && (grids[currentX + 1, currentY] == currentNumber + 1 || grids[currentX + 1, currentY] == 0))
         {
-            Debug.Log(2);
             return true;
         }
 
         if (currentY > 0 && (grids[currentX, currentY - 1] == currentNumber + 1 || grids[currentX, currentY - 1] == 0))
         {
-            Debug.Log(3);
             return true;
         }
 
         if (currentY < grids.GetLength(1) - 1 && (grids[currentX, currentY + 1] == currentNumber + 1 || grids[currentX, currentY + 1] == 0))
         {
-            Debug.Log(4);
             return true;
         }
 
-        Debug.Log(5);
         GameManager.Instance.gameState = GameState.End;
         return false;
     }
@@ -190,11 +209,17 @@ public class MapGenerator : MonoBehaviour
 
         if (grid.Number == 0 || grid.Number == currentNumber + 1)
         {
+            if (currentNumber != 0)
+            {
+                DrawLine(currentX, currentY, grid.x, grid.y);
+            }
             currentNumber++;
             grid.Number = currentNumber;
             currentX = grid.x;
             currentY = grid.y;
             grids[currentX, currentY] = currentNumber;
+
+            // Draw Line
         }
 
         if (!CheckGameState())
@@ -207,6 +232,35 @@ public class MapGenerator : MonoBehaviour
         {
             // 游戏结束
             UnityEngine.Debug.Log("游戏结束, You Success !");
+        }
+    }
+
+    private void ClearAllLines()
+    {
+        foreach (GameObject line in lines)
+        {
+            line.SetActive(false);
+            cachedLines.Add(line);
+        }
+        lines.Clear();
+    }
+
+    private void DrawLine(int startX, int startY, int endX, int endY)
+    {
+        GameObject line = GetLine();
+
+        // 判定是绘制横线还是竖线
+        if (startX == endX)
+        {
+            // 竖线
+            line.transform.position = new Vector3(1.1f * startX - 1.1f * grids.GetLength(0) * 0.5f, 1.1f * (startY + endY) * 0.5f - 1.1f * grids.GetLength(1) * 0.5f, 0);
+            line.transform.localScale = new Vector3(0.1f, 1.1f * Mathf.Abs(startY - endY), 1);
+        }
+        else
+        {
+            // 横线
+            line.transform.position = new Vector3(1.1f * (startX + endX) * 0.5f - 1.1f * grids.GetLength(0) * 0.5f, 1.1f * startY - 1.1f * grids.GetLength(1) * 0.5f, 0);
+            line.transform.localScale = new Vector3(1.1f * Mathf.Abs(startX - endX), 0.1f, 1);
         }
     }
 
@@ -230,11 +284,20 @@ public class MapGenerator : MonoBehaviour
 
         if (grid.Number == 0 || grid.Number == currentNumber + 1)
         {
+            if (currentNumber != 0)
+            {
+                DrawLine(currentX, currentY, grid.x, grid.y);
+            }
+
             currentNumber++;
             grid.Number = currentNumber;
+
             currentX = grid.x;
             currentY = grid.y;
             grids[currentX, currentY] = currentNumber;
+
+
+
         }
 
         if (!CheckGameState())
