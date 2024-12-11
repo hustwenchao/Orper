@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class NumberGrid : MonoBehaviour
 {
-    public Action<NumberGrid> OnSquareGridClicked;
-    public Action<NumberGrid> OnSquareGridEnter;
-    public Action<NumberGrid> OnSquareGridUp;
+    private TextMeshPro numberText;
+    private SpriteRenderer spriteRenderer;
+
+    public Action<NumberGrid> OnNumberGridClicked;
+    public Action<NumberGrid> OnNumberGridEnter;
+    public Action<NumberGrid> OnNumberGridUp;
 
     public int x;
     public int y;
@@ -20,27 +23,40 @@ public class NumberGrid : MonoBehaviour
             if (value > 0)
             {
                 _number = value;
-                GetComponentInChildren<TextMeshPro>().text = _number.ToString();
+                numberText.text = _number.ToString();
             }
             else
             {
                 _number = 0;
-                GetComponentInChildren<TextMeshPro>().text = "";
+                numberText.text = "";
             }
+        }
+    }
+
+    private bool occupy = false;
+    public bool Occupy
+    {
+        get { return occupy; }
+        set
+        {
+            occupy = value;
+            spriteRenderer.color = value ? Color.cyan : Color.white;
         }
     }
 
     private void Awake()
     {
-        GetComponentInChildren<TextMeshPro>().text = "";
+        numberText = GetComponentInChildren<TextMeshPro>();
+        numberText.text = "";
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // 鼠标在当前节点按下
     private void OnMouseDown()
     {
-        if (OnSquareGridClicked != null)
+        if (OnNumberGridClicked != null)
         {
-            OnSquareGridClicked.Invoke(this);
+            OnNumberGridClicked.Invoke(this);
         }
     }
 
@@ -53,25 +69,26 @@ public class NumberGrid : MonoBehaviour
     // 鼠标进入当前节点
     private void OnMouseEnter()
     {
-        if (OnSquareGridEnter != null)
+        if (OnNumberGridEnter != null)
         {
-            OnSquareGridEnter.Invoke(this);
+            OnNumberGridEnter.Invoke(this);
         }
     }
 
     // 鼠标在当前节点抬起
     private void OnMouseUp()
     {
-        if (OnSquareGridUp != null)
+        if (OnNumberGridUp != null)
         {
-            OnSquareGridUp.Invoke(this);
+            OnNumberGridUp.Invoke(this);
         }
     }
 
     public void Recycle()
     {
-        OnSquareGridClicked = null;
-        OnSquareGridEnter = null;
+        OnNumberGridClicked = null;
+        OnNumberGridEnter = null;
+        OnNumberGridUp = null;
     }
 
     public void SetIndex(int i, int j)
