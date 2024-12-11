@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 3315619380866122987}
   - component: {fileID: 3315619380866122984}
-  - component: {fileID: -2620905154077190380}
   - component: {fileID: 8162891795967359308}
+  - component: {fileID: 837152268707881606}
   m_Layer: 0
-  m_Name: Square
+  m_Name: NumberGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,18 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-2620905154077190380
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3315619380866122985}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9efa74d1ac5ff3418d73f7f7cc40f82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!61 &8162891795967359308
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -125,6 +113,20 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &837152268707881606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3315619380866122985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74ee822362a68a440bbc971ca6b414f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  x: 0
+  y: 0
 --- !u!1 &6653822075559702000
 GameObject:
   m_ObjectHideFlags: 0

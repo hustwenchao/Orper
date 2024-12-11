@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6329441251802386616}
   - component: {fileID: 6329441251802386619}
+  - component: {fileID: 4432383432582604848}
   m_Layer: 0
-  m_Name: Line
+  m_Name: MoveLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -84,3 +85,15 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4432383432582604848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6329441251802386618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42f9b50b3b2f9c047b58f4c0b51c2940, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

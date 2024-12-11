@@ -60,7 +60,7 @@ public class MapGenerator : MonoBehaviour
         currentY = 0;
         currentNumber = 0;
         finished = false;
-        GameManager.Instance.gameState = GameState.Start;
+        DebugGameManager.Instance.gameState = GameState.Start;
     }
 
     private void HideGrids(int[,] grids, int hideCount)
@@ -156,7 +156,7 @@ public class MapGenerator : MonoBehaviour
         {
             // 已经成功
             finished = true;
-            GameManager.Instance.gameState = GameState.End;
+            DebugGameManager.Instance.gameState = GameState.End;
             return true;
         }
 
@@ -181,31 +181,31 @@ public class MapGenerator : MonoBehaviour
             return true;
         }
 
-        GameManager.Instance.gameState = GameState.End;
+        DebugGameManager.Instance.gameState = GameState.End;
         return false;
     }
 
     private void OnSquareGridUp(SquareGrid grid)
     {
-        if (GameManager.Instance.gameState == GameState.End)
+        if (DebugGameManager.Instance.gameState == GameState.End)
         {
             return;
         }
 
-        if (GameManager.Instance.gameState == GameState.Playing)
+        if (DebugGameManager.Instance.gameState == GameState.Playing)
         {
-            GameManager.Instance.gameState = GameState.Pause;
+            DebugGameManager.Instance.gameState = GameState.Pause;
         }
     }
 
     private void OnSquareGridClicked(SquareGrid grid)
     {
-        if (GameManager.Instance.gameState == GameState.End)
+        if (DebugGameManager.Instance.gameState == GameState.End)
         {
             return;
         }
 
-        GameManager.Instance.gameState = GameState.Playing;
+        DebugGameManager.Instance.gameState = GameState.Playing;
 
         if (grid.Number == 0 || grid.Number == currentNumber + 1)
         {
@@ -266,12 +266,12 @@ public class MapGenerator : MonoBehaviour
 
     private void OnSquareGridEnter(SquareGrid grid)
     {
-        if (GameManager.Instance.gameState == GameState.End)
+        if (DebugGameManager.Instance.gameState == GameState.End)
         {
             return;
         }
 
-        if (GameManager.Instance.gameState == GameState.Pause)
+        if (DebugGameManager.Instance.gameState == GameState.Pause)
         {
             return;
         }

@@ -1,22 +1,22 @@
 public enum GameState { Start, Playing, Pause, End }
 
-public class GameManager
+public class DebugGameManager
 {
 
-    private GameManager()
+    private DebugGameManager()
     {
 
     }
 
-    private static GameManager _instance;
-    public static GameManager Instance
+    private static DebugGameManager _instance;
+    public static DebugGameManager Instance
     {
 
         get
         {
             if (_instance == null)
             {
-                _instance = new GameManager();
+                _instance = new DebugGameManager();
             }
             return _instance;
         }
