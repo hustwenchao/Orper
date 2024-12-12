@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -63,6 +62,7 @@ public class GameManager : MonoBehaviour
         if (PlayerManager.Instance.CurrentLevel < LevelManager.Instance.GetMaxLevel())
         {
             PlayerManager.Instance.AddLevel();
+            canvas.Refresh();
             SetGameBoard(PlayerManager.Instance.CurrentLevel);
         }
     }

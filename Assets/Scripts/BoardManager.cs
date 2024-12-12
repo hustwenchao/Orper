@@ -112,6 +112,7 @@ public class BoardManager : MonoBehaviour
     private void OnNumberGridDown(NumberGrid grid)
     {
         // 每次重新点击的时候，清空之前的连接线，重新选择起点
+        GameManager.Instance.UpdateGameState(GameState.Start);
         ClearAllLines();
         ResetBoardToInitState();
         currentNumber = 0;
@@ -124,7 +125,8 @@ public class BoardManager : MonoBehaviour
         }
         else
         {
-            activeGrid.UpdateNumberAndState(currentNumber, NumberGridState.Wrong);
+            currentNumber = grid.Number;
+            activeGrid.UpdateNumberAndState(grid.Number, NumberGridState.Wrong);
             GameManager.Instance.UpdateGameState(GameState.Failed);
         }
     }
@@ -132,7 +134,7 @@ public class BoardManager : MonoBehaviour
 
     private void OnNumberGridEnter(NumberGrid grid)
     {
-        if (activeGrid == null)
+        if (activeGrid == null || grid.State == NumberGridState.Right)
         {
             return;
         }
@@ -146,9 +148,14 @@ public class BoardManager : MonoBehaviour
                 ConnectGrid(activeGrid, grid);
                 activeGrid = grid;
             }
+            else
+            {
+                grid.UpdateNumberAndState(grid.Number, NumberGridState.Wrong);
+            }
         }
 
-        if (activeGrid.Number == gridState.GetLength(0) * gridState.GetLength(1))
+
+        if (GameManager.Instance.State != GameState.Failed && activeGrid.Number == gridState.GetLength(0) * gridState.GetLength(1))
         {
             // 达成目标
             Debug.Log("Game Level Success");
@@ -162,6 +169,9 @@ public class BoardManager : MonoBehaviour
         if (GameManager.Instance.State == GameState.Success)
         {
             GameManager.Instance.LevelSuccess();
+        }
+        else
+        {
         }
     }
 

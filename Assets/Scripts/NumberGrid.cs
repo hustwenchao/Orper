@@ -16,6 +16,10 @@ public class NumberGrid : MonoBehaviour
     };
 
     private NumberGridState state;
+    public NumberGridState State
+    {
+        get { return state; }
+    }
 
     private TextMeshPro numberText;
     private SpriteRenderer spriteRenderer;
