@@ -373,7 +373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95d5b30b6bb871244bbf163a8bf0e98b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  title: {fileID: 0}
+  title: {fileID: 725114492}
   restartGameBtn: {fileID: 1184379971}
 --- !u!1 &1159499736
 GameObject:
@@ -857,6 +857,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45d05035e40ed2c45866a38c9df5ea58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 1055233416}
 --- !u!1 &1882201805
 GameObject:
   m_ObjectHideFlags: 0

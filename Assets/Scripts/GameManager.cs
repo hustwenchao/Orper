@@ -1,7 +1,29 @@
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    private GameState state = GameState.Start;
+
+    public GameState State
+    {
+        get { return state; }
+    }
+
+    private static GameManager instance;
+    public static GameManager Instance
+    {
+        get
+        {
+            return instance;
+        }
+    }
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     public MainCanvas canvas;
 
     private void LoadPlayerState()
@@ -28,6 +50,20 @@ public class GameManager : MonoBehaviour
 
     private void SetGameBoard(int level)
     {
-        BoardManager.Instance.SetBoards(LevelManager.Instance.GetLevel(level));
+        BoardManager.Instance.SetBoards(LevelManager.Instance.GetLevelConfig(level));
+    }
+
+    public void UpdateGameState(GameState newState)
+    {
+        state = newState;
+    }
+
+    public void LevelSuccess()
+    {
+        if (PlayerManager.Instance.CurrentLevel < LevelManager.Instance.GetMaxLevel())
+        {
+            PlayerManager.Instance.AddLevel();
+            SetGameBoard(PlayerManager.Instance.CurrentLevel);
+        }
     }
 }

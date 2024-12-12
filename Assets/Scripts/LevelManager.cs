@@ -66,8 +66,13 @@ public class LevelManager
 #endif
     }
 
-    public int[,] GetLevel(int level)
+    public int[,] GetLevelConfig(int level)
     {
         return gameLevels[level - 1];
+    }
+
+    public int GetMaxLevel()
+    {
+        return gameLevels.Count;
     }
 }

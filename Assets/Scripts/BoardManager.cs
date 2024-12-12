@@ -42,6 +42,15 @@ public class BoardManager : MonoBehaviour
         linePool = new ObjectPool<MoveLine>(line, 10);
     }
 
+    private void ClearAllLines()
+    {
+        foreach (var line in lines)
+        {
+            linePool.ReturnToPool(line);
+        }
+        lines.Clear();
+    }
+
     private void CollectAll()
     {
         foreach (var grid in grids)
@@ -50,11 +59,7 @@ public class BoardManager : MonoBehaviour
             gridPool.ReturnToPool(grid);
         }
         grids.Clear();
-        foreach (var line in lines)
-        {
-            linePool.ReturnToPool(line);
-        }
-        lines.Clear();
+        ClearAllLines();
     }
 
     public void SetBoards(int[,] grids)
@@ -70,46 +75,57 @@ public class BoardManager : MonoBehaviour
             for (int j = 0; j < length; j++)
             {
                 NumberGrid grid = gridPool.Get();
-                grid.OnNumberGridClicked = OnNumberGridClicked;
+                grid.OnNumberGridDown = OnNumberGridDown;
                 grid.OnNumberGridEnter = OnNumberGridEnter;
                 grid.OnNumberGridUp = OnNumberGridUp;
                 grid.gameObject.SetActive(true);
                 grid.transform.position = new Vector3(GridSize * j + Gap * j, -(GridSize * i + Gap * i), 0) + offset;
-                grid.Number = grids[i, j];
+                grid.UpdateNumberAndState(grids[i, j], NumberGridState.Init);
                 grid.x = i;
                 grid.y = j;
                 this.grids.Add(grid);
             }
         }
-        initialGridState = grids;
 
         // 拷贝一份 grid 作为棋盘的初始状态
         gridState = new int[grids.GetLength(0), grids.GetLength(1)];
+        initialGridState = new int[grids.GetLength(0), grids.GetLength(1)];
         for (int i = 0; i < grids.GetLength(0); i++)
         {
             for (int j = 0; j < grids.GetLength(1); j++)
             {
                 gridState[i, j] = grids[i, j];
+                initialGridState[i, j] = grids[i, j];
             }
         }
     }
 
-    private void OnNumberGridClicked(NumberGrid grid)
+    private void ResetBoardToInitState()
     {
-        if (activeGrid == null)
+        foreach (NumberGrid grid in grids)
         {
-            activeGrid = grid;
+            grid.UpdateNumberAndState(initialGridState[grid.x, grid.y], NumberGridState.Init);
         }
-        else
-        {
-            return;
-        }
+    }
+
+
+    private void OnNumberGridDown(NumberGrid grid)
+    {
+        // 每次重新点击的时候，清空之前的连接线，重新选择起点
+        ClearAllLines();
+        ResetBoardToInitState();
+        currentNumber = 0;
+        activeGrid = grid;
 
         if (activeGrid.Number == 0 || activeGrid.Number == currentNumber + 1)
         {
             currentNumber++;
-            activeGrid.Number = currentNumber;
-            activeGrid.Occupy = true;
+            activeGrid.UpdateNumberAndState(currentNumber, NumberGridState.Right);
+        }
+        else
+        {
+            activeGrid.UpdateNumberAndState(currentNumber, NumberGridState.Wrong);
+            GameManager.Instance.UpdateGameState(GameState.Failed);
         }
     }
 
@@ -121,28 +137,32 @@ public class BoardManager : MonoBehaviour
             return;
         }
 
-        if (activeGrid.Number == gridState.GetLength(0) * gridState.GetLength(1))
-        {
-            // 达成目标
-        }
-
         if (IsGridsNear(activeGrid, grid))
         {
             if (grid.Number == 0 || grid.Number == currentNumber + 1)
             {
                 currentNumber++;
-                grid.Number = currentNumber;
-                grid.Occupy = true;
+                grid.UpdateNumberAndState(currentNumber, NumberGridState.Right);
                 ConnectGrid(activeGrid, grid);
                 activeGrid = grid;
-
             }
+        }
+
+        if (activeGrid.Number == gridState.GetLength(0) * gridState.GetLength(1))
+        {
+            // 达成目标
+            Debug.Log("Game Level Success");
+            GameManager.Instance.UpdateGameState(GameState.Success);
         }
     }
 
     private void OnNumberGridUp(NumberGrid grid)
     {
-
+        Debug.Log("OnNumberGridUp");
+        if (GameManager.Instance.State == GameState.Success)
+        {
+            GameManager.Instance.LevelSuccess();
+        }
     }
 
     private bool IsGridsNear(NumberGrid a, NumberGrid b)
@@ -161,6 +181,7 @@ public class BoardManager : MonoBehaviour
     private void ConnectGrid(NumberGrid a, NumberGrid b)
     {
         MoveLine line = linePool.Get();
+        lines.Add(line);
 
         // 确定是横向还是纵向
         if (a.x == b.x)

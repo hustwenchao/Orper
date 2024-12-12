@@ -1,47 +1,44 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+
+public enum NumberGridState { Init, Right, Wrong }
 
 public class NumberGrid : MonoBehaviour
 {
+    private Dictionary<NumberGridState, Color> colors = new Dictionary<NumberGridState, Color>
+    {
+        {NumberGridState.Init, Color.white},
+        {NumberGridState.Right, Color.green},
+        {NumberGridState.Wrong, Color.red}
+    };
+
+    private NumberGridState state;
+
     private TextMeshPro numberText;
     private SpriteRenderer spriteRenderer;
 
-    public Action<NumberGrid> OnNumberGridClicked;
+    public Action<NumberGrid> OnNumberGridDown;
     public Action<NumberGrid> OnNumberGridEnter;
     public Action<NumberGrid> OnNumberGridUp;
 
     public int x;
     public int y;
 
-    private int _number;
+    private int number;
     public int Number
     {
-        get { return _number; }
-        set
-        {
-            if (value > 0)
-            {
-                _number = value;
-                numberText.text = _number.ToString();
-            }
-            else
-            {
-                _number = 0;
-                numberText.text = "";
-            }
-        }
+        get { return number; }
     }
 
-    private bool occupy = false;
-    public bool Occupy
+    public void UpdateNumberAndState(int number, NumberGridState state)
     {
-        get { return occupy; }
-        set
-        {
-            occupy = value;
-            spriteRenderer.color = value ? Color.cyan : Color.white;
-        }
+        this.number = number;
+        numberText.text = number == 0 ? string.Empty : number.ToString();
+        this.state = state;
+        spriteRenderer.color = colors[state];
     }
 
     private void Awake()
@@ -54,9 +51,9 @@ public class NumberGrid : MonoBehaviour
     // 鼠标在当前节点按下
     private void OnMouseDown()
     {
-        if (OnNumberGridClicked != null)
+        if (OnNumberGridDown != null)
         {
-            OnNumberGridClicked.Invoke(this);
+            OnNumberGridDown.Invoke(this);
         }
     }
 
@@ -69,7 +66,7 @@ public class NumberGrid : MonoBehaviour
     // 鼠标进入当前节点
     private void OnMouseEnter()
     {
-        if (OnNumberGridEnter != null)
+        if (OnNumberGridEnter != null && Input.GetMouseButton((int)MouseButton.Left))
         {
             OnNumberGridEnter.Invoke(this);
         }
@@ -86,7 +83,7 @@ public class NumberGrid : MonoBehaviour
 
     public void Recycle()
     {
-        OnNumberGridClicked = null;
+        OnNumberGridDown = null;
         OnNumberGridEnter = null;
         OnNumberGridUp = null;
     }

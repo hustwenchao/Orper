@@ -111,4 +111,9 @@ public class PlayerManager
             currentLevel = 1;
         }
     }
+
+    public void AddLevel()
+    {
+        currentLevel += 1;
+    }
 }

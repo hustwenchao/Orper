@@ -1,4 +1,4 @@
-public enum GameState { Start, Playing, Pause, End }
+public enum GameState { Start, Playing, Pause, Failed, Success, End }
 
 public class DebugGameManager
 {
