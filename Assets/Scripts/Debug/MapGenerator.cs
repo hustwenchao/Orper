@@ -1,4 +1,7 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using TMPro;
 using UnityEditor;
@@ -7,6 +10,7 @@ using UnityEngine.UI;
 
 public class MapGenerator : MonoBehaviour
 {
+    public Button AutoGenerateLevelBtn;
     public Button CopyMapBtn;
     public Button GenerateMapBtn;
     public Slider slider;
@@ -29,6 +33,7 @@ public class MapGenerator : MonoBehaviour
 
     private void Awake()
     {
+        AutoGenerateLevelBtn.onClick.AddListener(AutoGenerateLevel);
         GenerateMapBtn.onClick.AddListener(ClickGenerateMap);
         CopyMapBtn.onClick.AddListener(ClickCopyMap);
         slider.onValueChanged.AddListener(OnSliderValueChanged);
@@ -39,6 +44,85 @@ public class MapGenerator : MonoBehaviour
     {
         hideCountSlider.minValue = 1;
         hideCountSlider.maxValue = (int)slider.value * (int)slider.value - 1;
+    }
+
+    private void AutoGenerateLevel()
+    {
+        try
+        {
+
+            JArray levelsArray = new JArray();
+
+            // 自动生成关卡
+            int level = 1;
+            for (int i = 2; i <= 7; i++)
+            {
+                for (int j = 1; j <= i * i - 1; j++)
+                {
+                    int[,] generatedGrids = CardCreator.CreateMap(i);
+
+                    while (generatedGrids == null)
+                    {
+                        UnityEngine.Debug.Log("生成失败，重新生成");
+                        generatedGrids = CardCreator.CreateMap(i);
+                    }
+
+                    hideCount = j;
+
+                    JObject levelObj = new JObject();
+
+                    levelObj["level"] = level;
+
+                    JArray answers = new JArray();
+
+                    for (int m = 0; m < i; m++)
+                    {
+                        JArray col = new JArray();
+                        for (int n = 0; n < i; n++)
+                        {
+                            col.Add(generatedGrids[m, n]);
+                        }
+                        answers.Add(col);
+                    }
+
+                    levelObj["answer"] = answers;
+
+                    // 随机隐藏几个格子，让用户来连接
+                    HideGrids(generatedGrids, j);
+
+                    JArray boards = new JArray();
+
+                    for (int m = 0; m < i; m++)
+                    {
+                        JArray col = new JArray();
+                        for (int n = 0; n < i; n++)
+                        {
+                            col.Add(generatedGrids[m, n]);
+                        }
+                        boards.Add(col);
+                    }
+
+                    levelObj["boards"] = boards;
+
+                    Debug.Log(string.Format("Level {0}生成成功", level));
+
+                    levelsArray.Add(levelObj);
+
+                    level += 1;
+
+                }
+            }
+
+            // 将LevelsArray写入JSON文件
+            string filePath = Path.Combine(Application.dataPath, "Resources", "AutoGenLevels.json");
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(levelsArray, Formatting.None), encoding: Encoding.UTF8);
+            Debug.Log("生成关卡成功");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("自动生成关卡失败：" + e.Message + e.StackTrace);
+        }
+
     }
 
     private void ClickGenerateMap()
@@ -67,16 +151,17 @@ public class MapGenerator : MonoBehaviour
         DebugGameManager.Instance.gameState = GameState.Start;
     }
 
-    private string GridToBuffer()
+
+    private string GridToBuffer(int[,] xxGrid)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append('[');
-        for (int i = 0; i < grids.GetLength(0); i++)
+        for (int i = 0; i < xxGrid.GetLength(0); i++)
         {
             sb.Append('[');
-            for (int j = 0; j < grids.GetLength(1); j++)
+            for (int j = 0; j < xxGrid.GetLength(1); j++)
             {
-                sb.Append(grids[i, j]);
+                sb.Append(xxGrid[i, j]);
                 sb.Append(',');
             }
             sb.Remove(sb.Length - 1, 1);
@@ -89,7 +174,7 @@ public class MapGenerator : MonoBehaviour
 
     private void ClickCopyMap()
     {
-        GUIUtility.systemCopyBuffer = GridToBuffer();
+        GUIUtility.systemCopyBuffer = GridToBuffer(grids);
     }
 
     private void HideGrids(int[,] grids, int hideCount)
