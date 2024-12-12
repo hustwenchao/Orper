@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MapGenerator : MonoBehaviour
 {
+    public Button CopyMapBtn;
     public Button GenerateMapBtn;
     public Slider slider;
     public Slider hideCountSlider;
@@ -27,6 +30,7 @@ public class MapGenerator : MonoBehaviour
     private void Awake()
     {
         GenerateMapBtn.onClick.AddListener(ClickGenerateMap);
+        CopyMapBtn.onClick.AddListener(ClickCopyMap);
         slider.onValueChanged.AddListener(OnSliderValueChanged);
         OnSliderValueChanged(slider.value);
     }
@@ -61,6 +65,31 @@ public class MapGenerator : MonoBehaviour
         currentNumber = 0;
         finished = false;
         DebugGameManager.Instance.gameState = GameState.Start;
+    }
+
+    private string GridToBuffer()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append('[');
+        for (int i = 0; i < grids.GetLength(0); i++)
+        {
+            sb.Append('[');
+            for (int j = 0; j < grids.GetLength(1); j++)
+            {
+                sb.Append(grids[i, j]);
+                sb.Append(',');
+            }
+            sb.Remove(sb.Length - 1, 1);
+            sb.Append("],");
+        }
+        sb.Remove(sb.Length - 1, 1);
+        sb.Append(']');
+        return sb.ToString();
+    }
+
+    private void ClickCopyMap()
+    {
+        GUIUtility.systemCopyBuffer = GridToBuffer();
     }
 
     private void HideGrids(int[,] grids, int hideCount)
